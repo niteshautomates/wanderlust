@@ -34,7 +34,7 @@ pipeline {
                 script {
                     withSonarQubeEnv(credentialsId: 'sonar-token') {
                         sh '''
-                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=Wonderlust-UI -Dsonar.sources=. -Dsonar.test.inclusions=**/*.test.js \
+                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectKey=Wonderlust-UI -Dsonar.sources=./frontend/ -Dsonar.test.inclusions=**/*.test.js \
                         -Dsonar.javascript.lcov.reportPaths=reports/lcov.info
                         '''
                     }
@@ -50,6 +50,15 @@ pipeline {
         }
     }
 }*/
+        stage('NPM Publish'){
+            steps{
+                dir('frontend'){
+                    configFileProvider([configFile(fileId: 'npmrc', targetLocation: '.')]) {
+                    sh 'npm publish'
+                    }
+                }
+            }
+        }
         stage('Trivy File Scan') {
             steps {
                 sh 'trivy fs -s CRITICAL .'
